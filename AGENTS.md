@@ -10,6 +10,20 @@ The package is a pack-neutral execution host: it ships no agent roles and no pla
 
 The extension is fire-and-forget: `subagent` returns an acknowledgement, and completion is delivered to the parent automatically. Never add polling guidance that tells callers to sleep, tail sessions, or repeatedly check status.
 
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live as markdown files under `.scratch/<feature-slug>/` in this repo, committed with the work they describe. GitHub is not this repo's tracker: the fork `ioOvOoi/pi-herdr-agents` is this checkout's `origin` and exists for pushing branches and opening PRs; `upstream` is the originating `giuseppecrj/pi-herdr-agents`. See [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md).
+
+### Triage labels
+
+The five canonical triage roles are recorded as the `Status:` line of an issue file, not as GitHub labels. See [`docs/agents/triage-labels.md`](docs/agents/triage-labels.md).
+
+### Domain docs
+
+Single-context: the domain glossary is [`CONTEXT.md`](CONTEXT.md) at the repo root and decisions are in [`docs/adr/`](docs/adr/). See [`docs/agents/domain.md`](docs/agents/domain.md).
+
 ## Read these first
 
 - [`README.md`](./README.md) — canonical installation and everyday-use guide
@@ -18,6 +32,7 @@ The extension is fire-and-forget: `subagent` returns an acknowledgement, and com
 - [`CONTEXT.md`](CONTEXT.md) — workflow-domain glossary; read it before changing orchestration design
 - [`docs/adr/0003-installable-role-packs.md`](docs/adr/0003-installable-role-packs.md) — installable role-pack discovery, precedence, and collision contract
 - [`docs/adr/0013-pack-neutral-execution-host.md`](docs/adr/0013-pack-neutral-execution-host.md) — role-free host ownership, removed commands, and `roles.bundled` deprecation
+- [`docs/branching.md`](docs/branching.md) — this fork's branch topology, worktree lanes, and how an upstream PR is proposed ([ADR-0018](docs/adr/0018-branch-and-worktree-workflow.md))
 - [`docs/worktree-subagents.md`](docs/worktree-subagents.md) — canonical worktree operating, review, recovery, and cleanup guide
 - [`RELEASING.md`](RELEASING.md) — release checks and publishing procedure
 
@@ -53,6 +68,25 @@ Former bundled roles, `/plan`, its plan skill, and `/skill:orchestrate` now belo
 - `test/package-manifest.test.js` — package manifest and pack-neutral package-content contract test
 - `test/integration/` — real Herdr and Pi lifecycle tests using the deterministic provider by default; `test/integration/agents/` holds test-only role fixtures, including the multi-wave `test-coordinator`
 - `test/bench/supervision-bench.mjs` — manual isolated-Herdr supervision transport benchmark; raw samples stay in `/tmp/issue29-bench/`
+
+## Branching and worktrees
+
+Two different things are called "worktree" in this repository. Keep them apart.
+
+- **Contributor lanes** — `.worktrees/<slug>`, one checkout per `feat/<slug>`
+  branch cut from `dev`. This is how changes are written and reviewed here; see
+  [`docs/branching.md`](docs/branching.md) and
+  [ADR-0018](docs/adr/0018-branch-and-worktree-workflow.md). Each lane installs
+  its own `node_modules`; never share dependencies between lanes.
+- **Host-managed worktrees** — what the `subagent` tool creates for a writing
+  child (`worktree: { branch, base? }`). That is shipped behavior, specified by
+  the worktree contract below and
+  [`docs/worktree-subagents.md`](docs/worktree-subagents.md).
+
+`main` mirrors `upstream/main` and never carries a local commit. `dev` is this
+fork's default branch and integration line: feature PRs target `dev`, and an
+upstream PR names one `feat/<slug>` as its head — never `dev`. The parent owns
+integration and cleanup; a delegated child never removes its own lane.
 
 ## Worktree contract
 
@@ -90,12 +124,14 @@ When behavior changes, update every affected surface in the same commit:
 - role-pack protocol or role frontmatter → `docs/roles.md`
 - troubleshooting steps → `docs/troubleshooting.md`
 - code map → this file and `docs/development.md`
+- branch topology, worktree lanes, or upstream-proposal rules → `docs/branching.md` and [ADR-0018](docs/adr/0018-branch-and-worktree-workflow.md)
 - role-pack discovery, precedence, or collision policy → `docs/adr/0003-installable-role-packs.md`
 - worktree behavior, handoff, recovery, or cleanup → `docs/worktree-subagents.md`
 - role prompts, `/plan`, and review-workflow methodology → the owning role pack, not this repository
 - the `PI_SUBAGENT_ID` child-context hint → `docs/tools.md` and `CONTEXT.md`
 - contributor/release verification → this file, `docs/development.md`, `.pi/skills/verify-pi-herdr-agents/SKILL.md`, `.pi/skills/run-integration-tests/SKILL.md`, or `RELEASING.md`
-- domain terminology → `CONTEXT.md`
+- domain terminology → `CONTEXT.md`, plus the consumer rules in `docs/agents/domain.md`
+- where issues live, their triage state strings, or how the engineering skills read the glossary → `docs/agents/`
 - hard-to-reverse orchestration trade-offs → the relevant ADR; do not create an ADR for every design question
 - architectural evidence and alternatives only → research docs, clearly marked when later decisions supersede them
 

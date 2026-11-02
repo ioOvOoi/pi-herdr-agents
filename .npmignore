@@ -6,6 +6,9 @@ docs/sidebar-plan.md
 test/
 scripts/
 docs/assets/
+docs/agents/
+.scratch/
+HANDOFF.md
 .github/
 .gitignore
 config.json

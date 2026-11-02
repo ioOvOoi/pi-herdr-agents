@@ -21,7 +21,13 @@ are evidence, not shipped contracts, when a later ADR supersedes them.
 - [`troubleshooting.md`](troubleshooting.md) — completion delivery and other
   common problems.
 - [`development.md`](development.md) — code map, CI, and local checks.
+- [`agents/`](agents/) — the local-markdown ticket conventions under
+  `.scratch/`, their triage state strings, and the glossary/ADR consumer rules
+  the engineering skills read.
 - [`../CONTEXT.md`](../CONTEXT.md) — orchestration glossary.
+- [`branching.md`](branching.md) — this fork's branch topology (`main` mirror,
+  `dev` integration line, `feat/*` lanes), worktree layout, and how an upstream
+  PR is proposed ([ADR-0018](adr/0018-branch-and-worktree-workflow.md)).
 - [`worktree-subagents.md`](worktree-subagents.md) — worktree operation,
   review, recovery, and cleanup.
 - [`../plugins/sidebar/README.md`](../plugins/sidebar/README.md) — the
