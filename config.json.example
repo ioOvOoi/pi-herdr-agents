@@ -20,6 +20,9 @@
     "direction": "right",
     "maxPerTab": 4
   },
+  "surface": {
+    "runtime": "auto"
+  },
   "guidelines": {
     "launchRoster": true
   },

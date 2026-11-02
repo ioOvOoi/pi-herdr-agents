@@ -11,6 +11,7 @@ type RepoArea =
 	| "adapters/pi"
 	| "adapters/fake"
 	| "surfaces/herdr"
+	| "surfaces/hc"
 	| "surfaces/fake"
 	| "runtime"
 	| "pi-extension"
@@ -135,6 +136,7 @@ function classifyRepoPath(repoPath: string): RepoArea {
 	if (repoPath.startsWith("maestro/adapters/pi/")) return "adapters/pi";
 	if (repoPath.startsWith("maestro/adapters/fake/")) return "adapters/fake";
 	if (repoPath.startsWith("maestro/surfaces/herdr/")) return "surfaces/herdr";
+	if (repoPath.startsWith("maestro/surfaces/hc/")) return "surfaces/hc";
 	if (repoPath.startsWith("maestro/surfaces/fake/")) return "surfaces/fake";
 	if (repoPath.startsWith("maestro/runtime/")) return "runtime";
 	return "other";
@@ -180,10 +182,22 @@ function isForbiddenEdge(root: string, reference: ModuleReference) {
 				["core", "surfaces/herdr"].includes(target) ||
 				(isNodeBuiltin(specifier) && !specifier.startsWith("@earendil-works/"))
 			);
+		// herdr-core (hc) is a second surface implementation with the same shape:
+		// it may own its own directory and core types, nothing else.
+		case "surfaces/hc":
+			return !(
+				["core", "surfaces/hc"].includes(target) ||
+				(isNodeBuiltin(specifier) && !specifier.startsWith("@earendil-works/"))
+			);
 		case "runtime":
 			return !(
-				["core", "adapters/pi", "surfaces/herdr", "runtime"].includes(target) ||
-				isNodeBuiltin(specifier)
+				[
+					"core",
+					"adapters/pi",
+					"surfaces/herdr",
+					"surfaces/hc",
+					"runtime",
+				].includes(target) || isNodeBuiltin(specifier)
 			);
 		case "adapters/fake":
 		case "surfaces/fake":

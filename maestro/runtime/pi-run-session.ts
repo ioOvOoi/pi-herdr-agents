@@ -32,7 +32,6 @@ import {
 	inspectNoProgressSessionTail,
 	type AttributedSummary,
 } from "../adapters/pi/session.ts";
-import { HerdrSurfaceProvider } from "../surfaces/herdr/herdr-surface-provider.ts";
 import { readSubagentActivityFile } from "../adapters/pi/activity-file.ts";
 import { projectActivity } from "../core/activity.ts";
 import {
@@ -52,7 +51,10 @@ import {
 	resolveRuntimePlans,
 	type ResolvedRuntimePlan,
 } from "../core/routing.ts";
-import { loadPaneConfig } from "../core/config/pane-config.ts";
+import {
+	createSurfaceProvider,
+	createSurfaceProviderForPaneConfig,
+} from "./surface-runtime.ts";
 import {
 	DelegatedMarkers,
 	herdrMarkerSessionReader,
@@ -238,11 +240,9 @@ export function createDefaultRunSession(
 		// this explicitly injected registry. Injected infrastructure already owns one.
 		const provider =
 			options.infrastructure?.surfaceProvider ??
-			new HerdrSurfaceProvider({
-				paneConfig: loadPaneConfig(
-					join(options.configDir, "herdr-agents"),
-					options.configExamplePath,
-				),
+			createSurfaceProvider({
+				configDir: join(options.configDir, "herdr-agents"),
+				configExamplePath: options.configExamplePath,
 			});
 		const wake = options.infrastructure ? undefined : new FileWakeRegistry();
 		const supervision =
@@ -505,7 +505,10 @@ export function createDefaultRunSession(
 		return {
 			...(state.options.infrastructure?.launchOperations ??
 				launchOperationsFromSurface(
-					new HerdrSurfaceProvider({ paneConfig: snapshot.paneConfig }),
+					createSurfaceProviderForPaneConfig(snapshot.paneConfig, {
+						configDir: join(state.options.configDir, "herdr-agents"),
+						configExamplePath: state.options.configExamplePath,
+					}),
 					snapshot.paneConfig,
 				)),
 			worktree: state.worktreeOperations,
